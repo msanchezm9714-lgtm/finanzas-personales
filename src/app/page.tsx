@@ -24,6 +24,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
           <button className="button button-primary" type="submit">Entrar a mi espacio <span>↗</span></button>
         </form>
         <p className="login-note">Acceso privado · Solo tú puedes ver tus movimientos</p>
+        <nav className="login-legal-links" aria-label="Información legal"><a href="/privacidad">Privacidad</a><a href="/condiciones">Condiciones</a><a href="/eliminar-datos">Eliminar datos</a></nav>
       </section>
       <aside className="login-art" aria-hidden="true">
         <div className="art-glow" />
