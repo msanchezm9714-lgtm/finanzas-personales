@@ -41,4 +41,13 @@ Next.js requiere Node.js 20.9 o superior. No compartas una clave service_role; l
 
 ## Camino de evolución
 
-El esquema deja espacio para añadir cuentas y enlazar transferencias con cuentas de origen y destino; también se pueden añadir presupuestos y metas con tablas propias vinculadas a user_id. Una futura integración de WhatsApp o IA deberá guardar las interpretaciones como borradores que la persona confirma antes de crear un movimiento.
+El esquema deja espacio para añadir cuentas y enlazar transferencias con cuentas de origen y destino; también se pueden añadir presupuestos y metas con tablas propias vinculadas a user_id.
+
+## WhatsApp (integración inicial)
+
+1. Ejecuta `supabase/migrations/202609300003_whatsapp_messages.sql` en el SQL Editor del proyecto ya existente. El identificador del mensaje impide guardar dos veces un movimiento si Meta reintenta la entrega.
+2. Configura en Vercel las variables de servidor `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ALLOWED_SENDER`, `WHATSAPP_USER_ID` y `SUPABASE_SECRET_KEY`. No uses el token temporal de WhatsApp como clave de Supabase; cada variable tiene un origen distinto. Nunca pongas estas variables en GitHub ni les añadas el prefijo `NEXT_PUBLIC_`.
+3. En Meta, configura la URL de devolución `https://TU-DOMINIO.vercel.app/api/whatsapp/webhook`, usa el mismo token de verificación y suscribe el campo `messages`.
+4. Desde el número permitido, envía un texto como `gasto 120 comida almuerzo` o `ingreso 500 salario pago`. Por ahora se aceptan solo esas órdenes claras. Otros textos, fotos y audios se omiten. El gasto se clasifica como necesario y personal por defecto, y el método de pago queda sin especificar. Los movimientos aparecen en el dashboard al recargarlo.
+
+El webhook comprueba la firma de Meta antes de guardar y acepta un único remitente. Más adelante se podrán añadir confirmaciones por WhatsApp, edición de campos, mensajes libres mediante IA y borradores para revisar interpretaciones ambiguas.
