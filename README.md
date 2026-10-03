@@ -15,7 +15,7 @@ Los dos servicios tienen modalidad gratuita suficiente para empezar como uso per
 ## Puesta en marcha
 
 1. Crea un proyecto en Supabase.
-2. En SQL Editor, ejecuta en orden los archivos supabase/migrations/202609300001_initial_schema.sql y supabase/migrations/202609300002_opening_balance.sql.
+2. En SQL Editor, ejecuta en orden los archivos `supabase/migrations/202609300001_initial_schema.sql`, `202609300002_opening_balance.sql`, `202610030001_planning.sql` y `202610030002_link_debt_payments.sql`. Las dos últimas migraciones ya se aplicaron al proyecto de producción de Walleto.
 3. En Supabase Auth, desactiva el registro público y crea tu usuario desde el panel de administración. El proxy de Next.js renueva las sesiones y las políticas RLS aíslan las filas por usuario.
 4. Copia .env.example como .env.local y completa la URL del proyecto y su clave publicable desde Project Settings → API.
 5. Instala dependencias y ejecuta el servidor local:
@@ -35,7 +35,10 @@ Next.js requiere Node.js 20.9 o superior. No compartas una clave service_role; l
 - transactions.type: income, expense o transfer.
 - El saldo disponible es saldo inicial más ingresos acumulados menos gastos acumulados.
 - El saldo inicial representa el dinero anterior al primer movimiento registrado. Puedes introducirlo desde el dashboard y no cuenta como ingreso del mes.
-- El dinero libre estimado es ingresos del mes menos gastos del mes.
+- El disponible para usar es el saldo registrado menos pagos pendientes con vencimiento en los próximos 30 días (incluidos vencidos) y menos lo reservado en apartados y metas. No representa el saldo bancario en tiempo real.
+- Al completar un pago o abonar a una deuda, se crea un gasto salvo que el usuario indique que ya lo registró. La actualización y el gasto se guardan en una sola operación de PostgreSQL para evitar duplicados por doble clic.
+- Un pago pendiente puede enlazarse a una deuda; cuando se completa, el saldo de esa deuda baja en la misma operación.
+- Los apartados y metas son reservas virtuales dentro del saldo registrado; mover dinero entre ellas no crea un ingreso, gasto ni transferencia bancaria.
 - El gasto por categoría cuenta solo gastos del mes.
 - La moneda inicial de presentación es MXN; cambia NEXT_PUBLIC_CURRENCY en .env.local para usar otra moneda.
 

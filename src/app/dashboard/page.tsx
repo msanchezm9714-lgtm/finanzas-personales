@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { createTransaction, saveOpeningBalance, signOut } from "@/app/actions";
+import { createTransaction, saveOpeningBalance } from "@/app/actions";
+import { AppHeader } from "@/app/components/app-header";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatMoney } from "@/lib/money";
 
@@ -23,7 +24,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/");
 
-  const [{ data, error: dataError }, { data: settings, error: settingsError }] = await Promise.all([
+  const [{ data, error: dataError }, { data: settings, error: settingsError }, { data: planned, error: paymentsError }, { data: pots, error: potsError }] = await Promise.all([
     supabase.from("transactions")
       .select("id,date,type,amount,category,description,payment_method,necessity,scope")
       .eq("user_id", user.id)
@@ -33,17 +34,35 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       .select("opening_balance")
       .eq("user_id", user.id)
       .maybeSingle(),
+    supabase.from("planned_payments")
+      .select("id,title,amount,due_date,paid_at")
+      .eq("user_id", user.id)
+      .is("paid_at", null)
+      .order("due_date", { ascending: true }),
+    supabase.from("money_pots")
+      .select("id,kind,allocated")
+      .eq("user_id", user.id),
   ]);
   const transactions = (data ?? []) as Transaction[];
   const openingBalance = Number(settings?.opening_balance ?? 0);
 
   const today = new Date();
-  const monthStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)).toISOString().slice(0, 10);
+  const todayParts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Cancun", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(today);
+  const dateValues = Object.fromEntries(todayParts.map(({ type, value }) => [type, value]));
+  const todayKey = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
+  const monthStart = `${dateValues.year}-${dateValues.month}-01`;
   const monthTransactions = transactions.filter((item) => item.date >= monthStart);
   const total = transactions.reduce((sum, item) => sum + (item.type === "income" ? Number(item.amount) : item.type === "expense" ? -Number(item.amount) : 0), openingBalance);
   const income = monthTransactions.filter((item) => item.type === "income").reduce((sum, item) => sum + Number(item.amount), 0);
   const expenses = monthTransactions.filter((item) => item.type === "expense").reduce((sum, item) => sum + Number(item.amount), 0);
-  const freeMoney = income - expenses;
+  const inThirtyDays = new Date(`${todayKey}T12:00:00Z`);
+  inThirtyDays.setUTCDate(inThirtyDays.getUTCDate() + 30);
+  const cutoff = inThirtyDays.toISOString().slice(0, 10);
+  const upcoming = (planned ?? []).filter((item) => item.due_date <= cutoff);
+  const upcomingAmount = upcoming.reduce((sum, item) => sum + Number(item.amount), 0);
+  const reservedAmount = (pots ?? []).reduce((sum, item) => sum + Number(item.allocated), 0);
+  const planningReady = !paymentsError && !potsError;
+  const availableForUse = total - upcomingAmount - reservedAmount;
   const categoryTotals = Object.entries(monthTransactions.filter((item) => item.type === "expense").reduce<Record<string, number>>((totals, item) => {
     totals[item.category] = (totals[item.category] ?? 0) + Number(item.amount);
     return totals;
@@ -53,19 +72,18 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
   return (
     <main className="app-shell">
-      <header className="topbar">
-        <a className="brand" href="/dashboard"><span className="brand-mark small" aria-hidden="true"/><span>Walleto</span></a>
-        <div className="topbar-right"><span className="avatar">{(user.email?.[0] ?? "T").toUpperCase()}</span><span className="user-email">{user.email}</span><form action={signOut}><button className="text-button" type="submit">Salir</button></form></div>
-      </header>
+      <AppHeader email={user.email} />
       <div className="dashboard-wrap">
         <div className="welcome-row"><div><p className="eyebrow">TU RESUMEN PERSONAL</p><h1>Tu dinero, en perspectiva.</h1><p className="muted">Cada movimiento cuenta una parte de tu historia.</p></div><div className="welcome-actions"><a className="button button-primary" href="/registrar">+ Registrar gasto</a><div className="month-pill"><span className="status-dot"/> {monthName}</div></div></div>
-        {error && <div className="notice error-notice">{error}</div>}{saved && <div className="notice success-notice">{saved === "opening" ? "Saldo inicial guardado correctamente." : "Movimiento guardado correctamente."}</div>}{dataError && <div className="notice error-notice">No se pudieron cargar los movimientos. Revisa la configuración de Supabase.</div>}{settingsError && <div className="notice error-notice">Falta crear la tabla de saldo inicial en Supabase.</div>}
+        {error && <div className="notice error-notice">{error}</div>}{saved && <div className="notice success-notice">{saved === "opening" ? "Saldo inicial guardado correctamente." : "Movimiento guardado correctamente."}</div>}{dataError && <div className="notice error-notice">No se pudieron cargar los movimientos. Revisa la configuración de Supabase.</div>}{settingsError && <div className="notice error-notice">Falta crear la tabla de saldo inicial en Supabase.</div>}{!planningReady && <div className="notice error-notice">Falta activar las nuevas secciones de planificación en Supabase.</div>}
         <section className="summary-grid" aria-label="Resumen financiero">
           <article className="summary-card balance-card"><div className="card-top"><span>Saldo disponible</span><span className="card-icon">◉</span></div><strong>{formatMoney(total)}</strong><p>Saldo inicial + ingresos − gastos</p><div className="balance-line"><span/><span/><span/><span/><span/><span/><span/><span/><span/><span/></div></article>
           <article className="summary-card"><div className="card-top"><span>Ingresos del mes</span><span className="metric-icon income-icon">↗</span></div><strong>{formatMoney(income)}</strong><p className="metric-hint"><i className="positive-dot"/> {monthName}</p></article>
           <article className="summary-card"><div className="card-top"><span>Gastos del mes</span><span className="metric-icon expense-icon">↘</span></div><strong>{formatMoney(expenses)}</strong><p className="metric-hint"><i className="negative-dot"/> {monthName}</p></article>
-          <article className="summary-card free-card"><div className="card-top"><span>Dinero libre estimado</span><span className="metric-icon free-icon">✳</span></div><strong>{formatMoney(freeMoney)}</strong><p>Ingresos menos gastos de este mes</p></article>
+          <article className={`summary-card free-card ${availableForUse < 0 ? "deficit-card" : ""}`}><div className="card-top"><span>Disponible para usar</span><span className="metric-icon free-icon">✳</span></div><strong>{planningReady ? formatMoney(availableForUse) : "—"}</strong><p>Saldo registrado − pagos próximos − dinero apartado</p></article>
         </section>
+        {planningReady && <details className="available-breakdown"><summary>¿De dónde sale el disponible? <span>Ver cálculo ↗</span></summary><div className="breakdown-content"><div><span>Saldo registrado</span><strong>{formatMoney(total)}</strong></div><div><span>Pagos pendientes hasta dentro de 30 días</span><strong>− {formatMoney(upcomingAmount)}</strong></div><div><span>Apartados y metas de ahorro</span><strong>− {formatMoney(reservedAmount)}</strong></div><div className="breakdown-total"><span>Disponible para usar</span><strong>{formatMoney(availableForUse)}</strong></div><p>Es una estimación basada en lo que anotas en Walleto. Los abonos a deudas cuentan al pagarlos; el saldo completo de una deuda no se descuenta aquí.</p></div></details>}
+        <nav className="planning-shortcuts" aria-label="Planifica tu dinero"><a href="/plan/pagos"><span>◷</span><strong>Próximos pagos</strong><small>{planningReady ? `${(planned ?? []).length} pendientes` : "Organiza tus fechas"}</small></a><a href="/plan/deudas"><span>↘</span><strong>Tus deudas</strong><small>Avanza con cada abono</small></a><a href="/plan/apartados"><span>◈</span><strong>Apartados</strong><small>Dinero con destino</small></a><a href="/plan/metas"><span>✦</span><strong>Metas de ahorro</strong><small>Ve tu progreso</small></a></nav>
         {!settingsError && <section className="opening-panel">
           <details open={!settings}>
             <summary>{settings ? "Editar saldo inicial" : "Configura tu saldo inicial"}</summary>
