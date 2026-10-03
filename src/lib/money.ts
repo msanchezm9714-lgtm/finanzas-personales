@@ -2,7 +2,8 @@ export function formatMoney(value: number, currency = process.env.NEXT_PUBLIC_CU
   return new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 

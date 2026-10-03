@@ -2,22 +2,23 @@ import { redirect } from "next/navigation";
 import { signIn } from "@/app/actions";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+export default async function Home({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
+  const { error, next } = await searchParams;
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) redirect("/dashboard");
+    if (user) redirect(next === "registrar" ? "/registrar" : "/dashboard");
   }
 
   return (
     <main className="login-screen">
       <section className="login-card">
-        <div className="brand-mark">b</div>
+        <div className="login-brand"><span className="brand-mark" aria-hidden="true">b</span><span>balance</span></div>
         <p className="eyebrow">TU DINERO, MÁS CLARO</p>
-        <h1>Finanzas en<br /><span>equilibrio.</span></h1>
+        <h1>Tu dinero,<br /><span>en perspectiva.</span></h1>
         <p className="login-copy">Un espacio privado para entender cómo se mueve tu dinero.</p>
         <form action={signIn} className="login-form">
+          {next === "registrar" && <input type="hidden" name="next" value="registrar" />}
           <label>Correo electrónico<input name="email" type="email" autoComplete="email" placeholder="tu@correo.com" required /></label>
           <label>Contraseña<input name="password" type="password" autoComplete="current-password" placeholder="Tu contraseña" required /></label>
           {error && <p className="form-error">{error}</p>}

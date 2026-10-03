@@ -9,10 +9,10 @@ export default function PrivacyPage() {
   return (
     <main className="legal-page">
       <article className="legal-card">
-        <a className="legal-brand" href="/">Finanzas Personales</a>
+        <a className="legal-brand" href="/">balance</a>
         <p className="eyebrow">INFORMACIÓN SOBRE TUS DATOS</p>
         <h1>Política de privacidad</h1>
-        <p className="legal-updated">Actualizada el 30 de septiembre de 2026</p>
+        <p className="legal-updated">Actualizada el 2 de octubre de 2026</p>
 
         <section>
           <h2>Quién administra la aplicación</h2>
@@ -21,7 +21,8 @@ export default function PrivacyPage() {
         <section>
           <h2>Qué datos se tratan</h2>
           <p>Se utiliza el correo electrónico y la información necesaria para iniciar sesión. La aplicación guarda los movimientos que registras: fecha, importe, tipo, categoría, descripción y las clasificaciones que elijas, además del saldo inicial.</p>
-          <p>Si usas la integración de WhatsApp, se recibe el número del remitente y el texto del mensaje. Solo se aceptan mensajes del número autorizado. De las órdenes reconocidas se guardan los datos del movimiento y el identificador del mensaje para evitar duplicados. El texto completo del mensaje no se guarda como conversación en esta aplicación.</p>
+          <p>Cuando escribes en el registro tipo chat del navegador, la aplicación interpreta el texto para extraer el tipo de movimiento, el importe, la categoría y la descripción. Guarda esos datos como un movimiento. La conversación se reconstruye a partir de los movimientos; no se almacena el texto original como historial de chat.</p>
+          <p>Si en el futuro se habilita la integración opcional de WhatsApp, la aplicación también recibiría el número del remitente y el texto del mensaje para procesar órdenes autorizadas; de las órdenes reconocidas guardaría los datos del movimiento y el identificador del mensaje para evitar duplicados.</p>
         </section>
         <section>
           <h2>Para qué se usan</h2>
@@ -29,11 +30,11 @@ export default function PrivacyPage() {
         </section>
         <section>
           <h2>Servicios que intervienen</h2>
-          <p>Supabase proporciona la autenticación y la base de datos; Vercel aloja la aplicación. Cuando se usa WhatsApp, Meta transmite los mensajes al punto de conexión de la aplicación. Cada servicio trata la información que recibe según sus propias políticas.</p>
+          <p>Supabase proporciona la autenticación y la base de datos; Vercel aloja la aplicación. El registro tipo chat funciona en el navegador y no requiere enviar mensajes por WhatsApp. Si se habilita la integración opcional de WhatsApp, Meta transmitiría esos mensajes a la aplicación. Cada servicio trata la información que recibe según sus propias políticas.</p>
         </section>
         <section>
           <h2>Acceso y conservación</h2>
-          <p>Los movimientos se asocian a la cuenta que los creó y la base de datos limita el acceso a su propietario. Se conservan mientras la cuenta y sus registros sigan activos o hasta que solicites su eliminación. La aplicación no controla cuánto tiempo conserva WhatsApp los mensajes en sus propios servicios.</p>
+          <p>Los movimientos se asocian a la cuenta que los creó y la base de datos limita el acceso a su propietario. Se conservan mientras la cuenta y sus registros sigan activos o hasta que solicites su eliminación.</p>
         </section>
         <section>
           <h2>Tus solicitudes</h2>

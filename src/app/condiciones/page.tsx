@@ -9,10 +9,10 @@ export default function TermsPage() {
   return (
     <main className="legal-page">
       <article className="legal-card">
-        <a className="legal-brand" href="/">Finanzas Personales</a>
+        <a className="legal-brand" href="/">balance</a>
         <p className="eyebrow">USO DE LA APLICACIÓN</p>
         <h1>Condiciones de uso</h1>
-        <p className="legal-updated">Actualizadas el 30 de septiembre de 2026</p>
+        <p className="legal-updated">Actualizadas el 2 de octubre de 2026</p>
         <section>
           <h2>Servicio</h2>
           <p>Finanzas Personales permite registrar y consultar ingresos, gastos, transferencias y un saldo inicial. Sus resúmenes dependen de la información que se registre y pueden contener errores si los datos son incompletos o incorrectos. No ofrece asesoría financiera.</p>
@@ -22,8 +22,8 @@ export default function TermsPage() {
           <p>La aplicación es de acceso privado. Debes mantener tus credenciales en secreto y utilizar únicamente una cuenta que estés autorizado a usar.</p>
         </section>
         <section>
-          <h2>Mensajes de WhatsApp</h2>
-          <p>La integración acepta únicamente órdenes de texto del número autorizado y puede omitir mensajes que no reconozca. Revisa tus movimientos en el panel para confirmar que cada gasto o ingreso quedó registrado con los datos correctos.</p>
+          <h2>Registro tipo chat</h2>
+          <p>El registro desde el navegador interpreta frases breves para crear gastos o ingresos y puede omitir mensajes que no reconozca. Revisa tus movimientos en el panel para confirmar que cada dato quedó registrado correctamente.</p>
         </section>
         <section>
           <h2>Contacto</h2>

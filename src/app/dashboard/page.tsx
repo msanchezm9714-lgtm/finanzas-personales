@@ -53,11 +53,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="brand" href="/dashboard"><span className="brand-mark small">b</span><span>balance</span></a>
+        <a className="brand" href="/dashboard"><span className="brand-mark small" aria-hidden="true">b</span><span>balance</span></a>
         <div className="topbar-right"><span className="avatar">{(user.email?.[0] ?? "T").toUpperCase()}</span><span className="user-email">{user.email}</span><form action={signOut}><button className="text-button" type="submit">Salir</button></form></div>
       </header>
       <div className="dashboard-wrap">
-        <div className="welcome-row"><div><p className="eyebrow">TU RESUMEN PERSONAL</p><h1>Hola, qué bueno verte.</h1><p className="muted">Esto es lo que está pasando con tu dinero.</p></div><div className="month-pill"><span className="status-dot"/> {monthName}</div></div>
+        <div className="welcome-row"><div><p className="eyebrow">TU RESUMEN PERSONAL</p><h1>Tu dinero, en perspectiva.</h1><p className="muted">Cada movimiento cuenta una parte de tu historia.</p></div><div className="welcome-actions"><a className="button button-primary" href="/registrar">+ Registrar rápido</a><div className="month-pill"><span className="status-dot"/> {monthName}</div></div></div>
         {error && <div className="notice error-notice">{error}</div>}{saved && <div className="notice success-notice">{saved === "opening" ? "Saldo inicial guardado correctamente." : "Movimiento guardado correctamente."}</div>}{dataError && <div className="notice error-notice">No se pudieron cargar los movimientos. Revisa la configuración de Supabase.</div>}{settingsError && <div className="notice error-notice">Falta crear la tabla de saldo inicial en Supabase.</div>}
         <section className="summary-grid" aria-label="Resumen financiero">
           <article className="summary-card balance-card"><div className="card-top"><span>Saldo disponible</span><span className="card-icon">◉</span></div><strong>{formatMoney(total)}</strong><p>Saldo inicial + ingresos − gastos</p><div className="balance-line"><span/><span/><span/><span/><span/><span/><span/><span/><span/><span/></div></article>

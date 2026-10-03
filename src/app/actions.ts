@@ -3,16 +3,19 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { parseMovement } from "@/lib/whatsapp/parse";
 
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  if (!email || !password) redirect("/?error=Completa+tu+correo+y+contraseña");
+  const destination = formData.get("next") === "registrar" ? "/registrar" : "/dashboard";
+  const nextParam = destination === "/registrar" ? "&next=registrar" : "";
+  if (!email || !password) redirect(`/?error=${encodeURIComponent("Completa tu correo y contraseña")}${nextParam}`);
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect(`/?error=${encodeURIComponent("No se pudo iniciar sesión. Revisa tus datos.")}`);
-  redirect("/dashboard");
+  if (error) redirect(`/?error=${encodeURIComponent("No se pudo iniciar sesión. Revisa tus datos.")}${nextParam}`);
+  redirect(destination);
 }
 
 export async function signOut() {
@@ -69,4 +72,39 @@ export async function createTransaction(formData: FormData) {
   if (error) redirect("/dashboard?error=No+se+pudo+guardar+el+movimiento");
   revalidatePath("/dashboard");
   redirect("/dashboard?saved=1");
+}
+
+export async function createQuickMovement(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/?next=registrar");
+
+  const message = String(formData.get("message") ?? "").trim();
+  const movement = message.length <= 300 ? parseMovement(message) : null;
+  if (!movement) redirect("/registrar?error=formato");
+
+  const dateParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Cancun",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const dateValues = Object.fromEntries(dateParts.map(({ type, value }) => [type, value]));
+  const date = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
+
+  const { error } = await supabase.from("transactions").insert({
+    user_id: user.id,
+    date,
+    type: movement.type,
+    amount: movement.amount,
+    category: movement.category,
+    description: movement.description,
+    necessity: "necessary",
+    scope: "personal",
+  });
+
+  if (error) redirect("/registrar?error=guardar");
+  revalidatePath("/dashboard");
+  revalidatePath("/registrar");
+  redirect("/registrar?guardado=1");
 }
