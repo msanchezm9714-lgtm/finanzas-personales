@@ -58,11 +58,7 @@ a { color: inherit; text-decoration: none; }
 .login-art::after { width: 530px; height: 530px; right: -235px; top: 27%; }
 .art-glow { position: absolute; z-index: -1; width: 380px; height: 380px; top: 25%; left: 20%; border-radius: 50%; background: radial-gradient(circle, rgba(135, 167, 131, .28), transparent 70%); filter: blur(10px); }
 .art-kicker { margin: 0; font: 500 12px/1.7 'Avenir Next', Avenir, sans-serif; letter-spacing: .15em; }
-.art-circle { width: min(29vw, 310px); aspect-ratio: 1; align-self: center; position: relative; display: grid; place-items: center; border: 1px solid rgba(224, 238, 219, .4); border-radius: 50%; box-shadow: 0 0 0 23px rgba(224,238,219,.025), 0 0 0 48px rgba(224,238,219,.025), inset 0 0 40px rgba(224,238,219,.05); }
-.art-circle > span { font: 200 110px/1 'Avenir Next', Avenir, sans-serif; color: #d8e3d4; transform: translateY(-7px); }
-.orbit { position: absolute; border: 1px solid rgba(224,238,219,.2); border-radius: 50%; transform: rotate(-35deg); }
-.orbit-one { width: 140%; height: 52%; }
-.orbit-two { width: 140%; height: 74%; transform: rotate(35deg); }
+.art-portrait { width: min(34vw, 400px); height: auto; align-self: center; object-fit: contain; }
 .art-caption { margin: 0; font: italic 32px/1.2 var(--serif); color: #d9e4d5; }
 .art-index { position: absolute; right: 36px; bottom: 34px; color: #94a697; font-size: 10px; letter-spacing: .12em; }
 
@@ -216,9 +212,9 @@ a { color: inherit; text-decoration: none; }
   .login-card { padding: 34px 4px; }
   .login-card > .eyebrow { margin-top: 44px; }
   .login-art { min-height: 255px; padding: 22px; border-radius: 16px; }
-  .art-circle { position: absolute; width: 135px; right: 25px; top: 62px; }
-  .art-circle > span { font-size: 55px; }
-  .art-caption { font-size: 24px; }
+  .art-portrait { position: absolute; width: 140px; right: 12px; top: 57px; }
+  .art-kicker { max-width: 160px; }
+  .art-caption { max-width: 175px; font-size: 24px; }
   .art-index { right: 20px; bottom: 18px; }
   .topbar { height: 60px; padding: 0 17px; }
   .user-email { display: none; }

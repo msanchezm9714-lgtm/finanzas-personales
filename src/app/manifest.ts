@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "balance — Finanzas personales",
-    short_name: "balance",
+    name: "Wallet Cleaner — Finanzas personales",
+    short_name: "Wallet Cleaner",
     description: "Registra tus gastos e ingresos en un espacio privado.",
     start_url: "/registrar",
     scope: "/",

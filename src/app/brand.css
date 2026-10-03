@@ -47,9 +47,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .login-art::after { width: 650px; height: 210px; right: -185px; bottom: -15%; top: auto; border: 0; border-radius: 45%; background: linear-gradient(100deg, transparent, rgba(16, 182, 203, .75), rgba(208, 255, 120, .85), transparent); filter: blur(38px); transform: rotate(-24deg); }
 .art-glow { width: 520px; height: 500px; top: 2%; left: 5%; background: radial-gradient(circle, rgba(0, 40, 69, .05), rgba(0, 12, 22, .63) 62%, transparent 72%); filter: blur(18px); }
 .art-kicker { color: #d5ff9c; font-size: 12px; font-weight: 700; }
-.art-circle { width: min(28vw, 330px); border-color: rgba(208, 255, 120, .67); box-shadow: 0 0 0 23px rgba(36, 199, 214, .04), 0 0 0 48px rgba(208, 255, 120, .035), inset 0 0 44px rgba(36, 199, 214, .28); }
-.art-circle > span { color: #d0ff78; }
-.orbit { border-color: rgba(208, 255, 120, .3); }
+.art-portrait { filter: drop-shadow(0 0 24px rgba(0, 40, 69, .48)) drop-shadow(0 0 18px rgba(208, 255, 120, .2)); }
 .art-caption { color: #f0fff2; font-size: clamp(30px, 3vw, 45px); letter-spacing: -.05em; }
 .art-index { color: #d0ff78; }
 

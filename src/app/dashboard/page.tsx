@@ -53,7 +53,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="brand" href="/dashboard"><span className="brand-mark small" aria-hidden="true">b</span><span>balance</span></a>
+        <a className="brand" href="/dashboard"><span className="brand-mark small" aria-hidden="true"/><span>Wallet Cleaner</span></a>
         <div className="topbar-right"><span className="avatar">{(user.email?.[0] ?? "T").toUpperCase()}</span><span className="user-email">{user.email}</span><form action={signOut}><button className="text-button" type="submit">Salir</button></form></div>
       </header>
       <div className="dashboard-wrap">
@@ -95,7 +95,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <fieldset><legend>Ámbito</legend><div className="choice-row"><label><input type="radio" name="scope" value="personal" defaultChecked /><span>Personal</span></label><label><input type="radio" name="scope" value="work" /><span>Trabajo</span></label></div></fieldset>
           <div className="form-actions"><p>Tu información se guarda de forma privada en tu cuenta.</p><button className="button button-primary" type="submit">Guardar movimiento <span>↗</span></button></div>
         </form></section>
-        <footer className="app-footer"><span>balance <i>·</i> claridad financiera, a tu ritmo.</span><nav className="login-legal-links" aria-label="Información legal"><a href="/privacidad">Privacidad</a><a href="/condiciones">Condiciones</a><a href="/eliminar-datos">Eliminar datos</a></nav></footer>
+        <footer className="app-footer"><span>Wallet Cleaner <i>·</i> claridad financiera, a tu ritmo.</span><nav className="login-legal-links" aria-label="Información legal"><a href="/privacidad">Privacidad</a><a href="/condiciones">Condiciones</a><a href="/eliminar-datos">Eliminar datos</a></nav></footer>
       </div>
     </main>
   );

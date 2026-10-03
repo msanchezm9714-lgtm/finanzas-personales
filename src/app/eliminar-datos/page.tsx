@@ -9,7 +9,7 @@ export default function DeleteDataPage() {
   return (
     <main className="legal-page">
       <article className="legal-card">
-        <a className="legal-brand" href="/">balance</a>
+        <a className="legal-brand" href="/">Wallet Cleaner</a>
         <p className="eyebrow">CONTROL DE TU INFORMACIÓN</p>
         <h1>Eliminación de datos</h1>
         <p>Para solicitar la eliminación de tu cuenta y de los movimientos guardados en Finanzas Personales, escribe desde el correo asociado a tu cuenta a <a href="mailto:Msanchezm9714@gmail.com?subject=Eliminaci%C3%B3n%20de%20datos%20-%20Finanzas%20Personales">Msanchezm9714@gmail.com</a> con el asunto «Eliminación de datos - Finanzas Personales».</p>
