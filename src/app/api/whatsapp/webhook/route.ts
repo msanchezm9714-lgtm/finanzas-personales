@@ -32,6 +32,7 @@ function sameSecret(received: string, expected: string) {
 }
 
 export function GET(request: Request) {
+  if (process.env.WHATSAPP_ENABLED !== "true") return new Response("Webhook disabled", { status: 503 });
   const token = process.env.WHATSAPP_VERIFY_TOKEN;
   if (!token) return new Response("Webhook not configured", { status: 503 });
 
@@ -47,6 +48,7 @@ export function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (process.env.WHATSAPP_ENABLED !== "true") return new Response("Webhook disabled", { status: 503 });
   const appSecret = process.env.WHATSAPP_APP_SECRET;
   const allowedSender = process.env.WHATSAPP_ALLOWED_SENDER?.replace(/\D/g, "");
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;

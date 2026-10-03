@@ -26,6 +26,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const [{ data, error: dataError }, { data: settings, error: settingsError }] = await Promise.all([
     supabase.from("transactions")
       .select("id,date,type,amount,category,description,payment_method,necessity,scope")
+      .eq("user_id", user.id)
       .order("date", { ascending: false })
       .order("created_at", { ascending: false }),
     supabase.from("user_settings")

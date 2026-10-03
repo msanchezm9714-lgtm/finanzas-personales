@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Política de privacidad | Finanzas Personales",
@@ -9,7 +10,7 @@ export default function PrivacyPage() {
   return (
     <main className="legal-page">
       <article className="legal-card">
-        <a className="legal-brand" href="/">Walleto</a>
+        <Link className="legal-brand" href="/">Walleto</Link>
         <p className="eyebrow">INFORMACIÓN SOBRE TUS DATOS</p>
         <h1>Política de privacidad</h1>
         <p className="legal-updated">Actualizada el 2 de octubre de 2026</p>
@@ -40,7 +41,7 @@ export default function PrivacyPage() {
           <h2>Tus solicitudes</h2>
           <p>Puedes pedir acceso, corrección o eliminación de los datos guardados por esta aplicación escribiendo a <a href="mailto:Msanchezm9714@gmail.com">Msanchezm9714@gmail.com</a>. Consulta también las <a href="/eliminar-datos">instrucciones para eliminar datos</a>.</p>
         </section>
-        <nav className="legal-links" aria-label="Enlaces legales"><a href="/condiciones">Condiciones de uso</a><a href="/eliminar-datos">Eliminar datos</a><a href="/">Inicio</a></nav>
+        <nav className="legal-links" aria-label="Enlaces legales"><a href="/condiciones">Condiciones de uso</a><a href="/eliminar-datos">Eliminar datos</a><Link href="/">Inicio</Link></nav>
       </article>
     </main>
   );

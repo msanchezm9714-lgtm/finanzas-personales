@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Condiciones de uso | Finanzas Personales",
@@ -9,7 +10,7 @@ export default function TermsPage() {
   return (
     <main className="legal-page">
       <article className="legal-card">
-        <a className="legal-brand" href="/">Walleto</a>
+        <Link className="legal-brand" href="/">Walleto</Link>
         <p className="eyebrow">USO DE LA APLICACIÓN</p>
         <h1>Condiciones de uso</h1>
         <p className="legal-updated">Actualizadas el 2 de octubre de 2026</p>
@@ -29,7 +30,7 @@ export default function TermsPage() {
           <h2>Contacto</h2>
           <p>Para consultas sobre la aplicación, escribe a <a href="mailto:Msanchezm9714@gmail.com">Msanchezm9714@gmail.com</a>. El tratamiento de datos se explica en la <a href="/privacidad">política de privacidad</a>.</p>
         </section>
-        <nav className="legal-links" aria-label="Enlaces legales"><a href="/privacidad">Política de privacidad</a><a href="/eliminar-datos">Eliminar datos</a><a href="/">Inicio</a></nav>
+        <nav className="legal-links" aria-label="Enlaces legales"><a href="/privacidad">Política de privacidad</a><a href="/eliminar-datos">Eliminar datos</a><Link href="/">Inicio</Link></nav>
       </article>
     </main>
   );
