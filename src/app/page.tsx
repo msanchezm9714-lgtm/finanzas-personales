@@ -31,7 +31,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
       <aside className="login-art" aria-hidden="true">
         <div className="art-glow" />
         <p className="art-kicker">LLEVA UN ORDEN<br />EN TUS FINANZAS.</p>
-        <Image className="art-portrait" src="/wallet-cleaner-portrait.png" width={1254} height={1254} alt="" priority />
+        <Image className="art-portrait" src="/wallet-cleaner-face-reference.png" width={1254} height={1254} alt="" priority />
         <p className="art-caption">Tus decisiones<br />también cuentan.</p>
         <span className="art-index">01 — 03</span>
       </aside>
