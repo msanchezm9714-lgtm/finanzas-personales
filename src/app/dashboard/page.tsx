@@ -57,7 +57,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <div className="topbar-right"><span className="avatar">{(user.email?.[0] ?? "T").toUpperCase()}</span><span className="user-email">{user.email}</span><form action={signOut}><button className="text-button" type="submit">Salir</button></form></div>
       </header>
       <div className="dashboard-wrap">
-        <div className="welcome-row"><div><p className="eyebrow">TU RESUMEN PERSONAL</p><h1>Tu dinero, en perspectiva.</h1><p className="muted">Cada movimiento cuenta una parte de tu historia.</p></div><div className="welcome-actions"><a className="button button-primary" href="/registrar">+ Registrar rápido</a><div className="month-pill"><span className="status-dot"/> {monthName}</div></div></div>
+        <div className="welcome-row"><div><p className="eyebrow">TU RESUMEN PERSONAL</p><h1>Tu dinero, en perspectiva.</h1><p className="muted">Cada movimiento cuenta una parte de tu historia.</p></div><div className="welcome-actions"><a className="button button-primary" href="/registrar">+ Registrar gasto</a><div className="month-pill"><span className="status-dot"/> {monthName}</div></div></div>
         {error && <div className="notice error-notice">{error}</div>}{saved && <div className="notice success-notice">{saved === "opening" ? "Saldo inicial guardado correctamente." : "Movimiento guardado correctamente."}</div>}{dataError && <div className="notice error-notice">No se pudieron cargar los movimientos. Revisa la configuración de Supabase.</div>}{settingsError && <div className="notice error-notice">Falta crear la tabla de saldo inicial en Supabase.</div>}
         <section className="summary-grid" aria-label="Resumen financiero">
           <article className="summary-card balance-card"><div className="card-top"><span>Saldo disponible</span><span className="card-icon">◉</span></div><strong>{formatMoney(total)}</strong><p>Saldo inicial + ingresos − gastos</p><div className="balance-line"><span/><span/><span/><span/><span/><span/><span/><span/><span/><span/></div></article>
@@ -84,7 +84,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </section>
           <section className="panel categories-panel"><div className="panel-heading"><div><p className="eyebrow">EN QUÉ SE VA</p><h2>Gastos por categoría</h2></div><span className="subtle-period">Este mes</span></div>{categoryTotals.length === 0 ? <div className="empty-compact"><div className="category-placeholder">◌</div><p>Aún no hay gastos este mes.</p></div> : <div className="category-list">{categoryTotals.map(([category, amount], index) => <div className="category-item" key={category}><div className="category-line"><span><i className={`category-dot dot-${index}`} />{category}</span><strong>{formatMoney(amount)}</strong></div><div className="bar-track"><i className={`bar-fill fill-${index}`} style={{ width: `${Math.max(5, amount / maxCategory * 100)}%` }} /></div></div>)}</div>}<div className="category-footer"><span>Total de gastos</span><strong>{formatMoney(expenses)}</strong></div></section>
         </div>
-        <section className="panel form-panel" id="nuevo-movimiento"><div className="panel-heading"><div><p className="eyebrow">REGISTRO MANUAL</p><h2>Nuevo movimiento</h2></div><span className="form-step">01 <i/> 01</span></div><form action={createTransaction} className="transaction-form">
+        <section className="guided-entry-card" aria-label="Registro conversacional"><div><p className="eyebrow">UN GASTO, CUATRO RESPUESTAS</p><h2>Cuéntaselo a Walleto.</h2><p>Te pregunta cuánto fue, en qué lo gastaste y cuándo pasó. También te propone una categoría.</p></div><a className="button button-primary" href="/registrar">Empezar conversación ↗</a></section>
+        <details className="advanced-entry" id="nuevo-movimiento"><summary>¿Necesitas registrar un ingreso, transferencia o más detalles? <strong>Abrir registro avanzado ↗</strong></summary><section className="panel form-panel"><div className="panel-heading"><div><p className="eyebrow">REGISTRO AVANZADO</p><h2>Nuevo movimiento</h2></div></div><form action={createTransaction} className="transaction-form">
           <label>Tipo de movimiento<select name="type" defaultValue="expense"><option value="expense">Gasto</option><option value="income">Ingreso</option><option value="transfer">Transferencia</option></select></label>
           <label>Monto<input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></label>
           <label>Fecha<input name="date" type="date" defaultValue={today.toISOString().slice(0, 10)} required /></label>
@@ -94,9 +95,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <fieldset><legend>¿Cómo lo clasificarías?</legend><div className="choice-row"><label><input type="radio" name="necessity" value="necessary" defaultChecked /><span>Necesario</span></label><label><input type="radio" name="necessity" value="luxury" /><span>Lujo</span></label></div></fieldset>
           <fieldset><legend>Ámbito</legend><div className="choice-row"><label><input type="radio" name="scope" value="personal" defaultChecked /><span>Personal</span></label><label><input type="radio" name="scope" value="work" /><span>Trabajo</span></label></div></fieldset>
           <div className="form-actions"><p>Tu información se guarda de forma privada en tu cuenta.</p><button className="button button-primary" type="submit">Guardar movimiento <span>↗</span></button></div>
-        </form></section>
+        </form></section></details>
         <footer className="app-footer"><span>Walleto <i>·</i> claridad financiera, a tu ritmo.</span><nav className="login-legal-links" aria-label="Información legal"><a href="/privacidad">Privacidad</a><a href="/condiciones">Condiciones</a><a href="/eliminar-datos">Eliminar datos</a></nav></footer>
       </div>
+      <a className="quick-entry-fab" href="/registrar" aria-label="Registrar un gasto">+ Anotar gasto</a>
     </main>
   );
 }

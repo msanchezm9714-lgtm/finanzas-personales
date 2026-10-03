@@ -108,3 +108,40 @@ export async function createQuickMovement(formData: FormData) {
   revalidatePath("/registrar");
   redirect("/registrar?guardado=1");
 }
+
+export async function createGuidedExpense(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/?next=registrar");
+
+  const amountText = String(formData.get("amount") ?? "");
+  const amount = Number(amountText);
+  const description = String(formData.get("description") ?? "").trim();
+  const category = String(formData.get("category") ?? "");
+  const date = String(formData.get("date") ?? "");
+  const categories = ["Alimentación", "Vivienda", "Transporte", "Salud", "Entretenimiento", "Servicios", "Educación", "Compras", "Otros"];
+  const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Cancun", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const dateValues = Object.fromEntries(dateParts.map(({ type, value }) => [type, value]));
+  const today = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
+  const parsedDate = new Date(`${date}T12:00:00Z`);
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(parsedDate.getTime()) && parsedDate.toISOString().slice(0, 10) === date && date <= today;
+
+  if (!/^\d+(?:\.\d{1,2})?$/.test(amountText) || !Number.isFinite(amount) || amount <= 0 || amount > 999999999999.99 || !description || description.length > 160 || !categories.includes(category) || !validDate) {
+    redirect("/registrar?error=datos");
+  }
+
+  const { error } = await supabase.from("transactions").insert({
+    user_id: user.id,
+    date,
+    type: "expense",
+    amount,
+    category,
+    description,
+    necessity: "necessary",
+    scope: "personal",
+  });
+  if (error) redirect("/registrar?error=guardar");
+  revalidatePath("/dashboard");
+  revalidatePath("/registrar");
+  redirect("/registrar?guardado=1");
+}
