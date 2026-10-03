@@ -26,6 +26,7 @@ async function getTranscriber() {
   if (!transcriberPromise) {
     transcriberPromise = (async () => {
       const { env, pipeline } = await import("@huggingface/transformers");
+      env.allowLocalModels = true;
       env.allowRemoteModels = false;
       env.localModelPath = "/models/";
       const wasm = env.backends.onnx.wasm;
