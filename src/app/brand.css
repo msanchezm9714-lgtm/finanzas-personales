@@ -17,7 +17,7 @@
 
 body { background: #001b2b; color: var(--ink); }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--brand-lime); outline-offset: 3px; }
-.brand-mark { color: transparent; background: #002845 url('/icon.svg') center / cover no-repeat; box-shadow: 0 0 24px rgba(36, 199, 214, .22); }
+.brand-mark { color: transparent; background: #001b2b url('/walleto-face.png') center 48% / 128% auto no-repeat; background-blend-mode: screen; box-shadow: 0 0 24px rgba(208, 255, 120, .2); }
 .brand, .login-brand, .chat-identity strong, .legal-brand { font-family: var(--serif); font-weight: 400; letter-spacing: -.065em; }
 .eyebrow { color: var(--brand-cyan); }
 .button-primary { color: #002845; background: var(--brand-lime); box-shadow: 0 5px 20px rgba(208, 255, 120, .13); }
@@ -116,7 +116,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .chat-page { background: radial-gradient(ellipse at 17% 18%, rgba(16, 182, 203, .35), transparent 31%), radial-gradient(ellipse at 91% 84%, rgba(208, 255, 120, .25), transparent 27%), #001422; }
 .chat-shell { border-color: rgba(36, 199, 214, .54); background: #002845; box-shadow: 0 0 0 1px rgba(208, 255, 120, .1), 0 20px 90px rgba(0, 0, 0, .34), 0 0 45px rgba(36, 199, 214, .17); }
 .chat-header { border-color: rgba(36, 199, 214, .21); background: #002337; }
-.chat-avatar { color: transparent; background: #002845 url('/icon.svg') center / cover no-repeat; box-shadow: 0 0 17px rgba(36, 199, 214, .34); }
+.chat-avatar { flex: 0 0 45px; overflow: hidden; border: 1px solid rgba(208, 255, 120, .38); color: transparent; background: #001b2b url('/walleto-face.png') center 48% / 128% auto no-repeat; background-blend-mode: screen; box-shadow: 0 0 17px rgba(208, 255, 120, .22); }
 .chat-avatar span { display: none; }
 .chat-identity strong { color: #f4fff5; font-size: 24px; }
 .chat-identity small { color: #97bec5; }
@@ -206,6 +206,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .summary-card > strong { font-size: clamp(21px, 6.8vw, 30px); }
   .panel-heading h2 { font-size: 20px; }
   .chat-shell { border: 0; border-radius: 0; box-shadow: none; }
+  .chat-avatar { flex-basis: 40px; }
   .guided-entry-card { align-items: stretch; flex-direction: column; padding: 21px; }
   .guided-entry-card .button { width: 100%; }
   .advanced-entry > summary { flex-direction: column; gap: 5px; }
