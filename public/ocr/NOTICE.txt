@@ -1,0 +1,4 @@
+Tesseract.js worker and core files are distributed with tesseract.js 6.0.1.
+Spanish and English trained data are from @tesseract.js-data on jsDelivr.
+See https://github.com/naptha/tesseract.js for source and Apache-2.0 license.
+These assets are served by this application for local OCR in the browser.

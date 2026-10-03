@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { parseMovement } from "@/lib/whatsapp/parse";
+import { expenseCategories, incomeCategories } from "@/lib/chat-movement";
 
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -134,6 +135,44 @@ export async function createGuidedExpense(formData: FormData) {
     user_id: user.id,
     date,
     type: "expense",
+    amount,
+    category,
+    description,
+    necessity: "necessary",
+    scope: "personal",
+  });
+  if (error) redirect("/registrar?error=guardar");
+  revalidatePath("/dashboard");
+  revalidatePath("/registrar");
+  redirect("/registrar?guardado=1");
+}
+
+export async function createChatMovement(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/?next=registrar");
+
+  const type = String(formData.get("type") ?? "");
+  const amountText = String(formData.get("amount") ?? "");
+  const amount = Number(amountText);
+  const description = String(formData.get("description") ?? "").trim();
+  const category = String(formData.get("category") ?? "");
+  const date = String(formData.get("date") ?? "");
+  const options = type === "income" ? incomeCategories : expenseCategories;
+  const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Cancun", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const dateValues = Object.fromEntries(dateParts.map(({ type: part, value }) => [part, value]));
+  const today = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
+  const parsedDate = new Date(`${date}T12:00:00Z`);
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(parsedDate.getTime()) && parsedDate.toISOString().slice(0, 10) === date && date <= today;
+
+  if (!["income", "expense"].includes(type) || !/^\d+(?:\.\d{1,2})?$/.test(amountText) || !Number.isFinite(amount) || amount <= 0 || amount > 999999999999.99 || !description || description.length > 160 || !options.includes(category) || !validDate) {
+    redirect("/registrar?error=datos");
+  }
+
+  const { error } = await supabase.from("transactions").insert({
+    user_id: user.id,
+    date,
+    type,
     amount,
     category,
     description,

@@ -166,6 +166,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .guided-review > strong { display: block; margin: 10px 0 4px; color: #f5fff4; font: 400 36px var(--serif); }
 .guided-review p { margin: 0 0 5px; color: #f0faf5; overflow-wrap: anywhere; }
 .guided-review small { color: #a9cbd0; }
+.chat-edit-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.chat-edit-row button { border: 1px solid rgba(36, 199, 214, .38); border-radius: 8px; padding: 6px 9px; color: #d5f3ef; background: rgba(0, 40, 69, .45); font: inherit; font-size: 11px; cursor: pointer; }
+.chat-edit-row button:hover { border-color: var(--brand-lime); }
 .guided-save { width: 100%; min-height: 47px; margin-top: 18px; border: 0; border-radius: 11px; color: #002845; background: var(--brand-lime); font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
 .guided-edit { display: block; margin: 13px auto 0; border: 0; color: #b5d4d4; background: transparent; font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
 .guided-next-hint { margin: 8px 0; color: #b5d4d4; font-size: 13px; }
@@ -176,6 +179,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .chat-history-item { display: flex; justify-content: space-between; gap: 16px; padding: 8px 11px; border: 1px solid rgba(36, 199, 214, .22); border-radius: 9px; background: #07364a; }
 .chat-history-item strong { color: var(--brand-lime); white-space: nowrap; }
 .chat-composer-wrap.guided-composer-wrap { padding-top: 13px; }
+.chat-media-actions { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.chat-media-actions button { min-height: 36px; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border: 1px solid rgba(36, 199, 214, .35); border-radius: 10px; color: #e4f8f2; background: #07384b; font: inherit; font-size: 12px; cursor: pointer; }
+.chat-media-actions button:hover { border-color: var(--brand-lime); }
+.chat-media-actions button:disabled, .chat-composer button:disabled { opacity: .5; cursor: not-allowed; }
+.chat-media-actions button.is-recording { border-color: #ffb191; color: #ffd7c9; background: #563639; }
+.guided-scroll .chat-message p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.guided-scroll .chat-message .chat-sparkle { flex: 0 0 auto; }
 .guided-entry-card { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 17px; padding: 26px 30px; border: 1px solid rgba(208, 255, 120, .5); border-radius: 18px; background: radial-gradient(ellipse at 89% 0%, rgba(208, 255, 120, .2), transparent 35%), linear-gradient(130deg, #064b5b, #052c43); }
 .guided-entry-card h2 { margin: 8px 0; color: #f4fff7; font: 400 clamp(27px, 3vw, 38px) var(--serif); }
 .guided-entry-card p:last-child { max-width: 480px; margin: 0; color: #b7d9da; font-size: 14px; line-height: 1.5; }

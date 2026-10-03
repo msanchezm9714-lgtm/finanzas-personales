@@ -1,0 +1,8 @@
+The whisper-tiny files in this directory are the quantized ONNX conversion from
+https://huggingface.co/onnx-community/whisper-tiny of OpenAI Whisper Tiny.
+The underlying model is licensed under Apache-2.0:
+https://huggingface.co/openai/whisper-tiny
+
+The runtime files are distributed with @huggingface/transformers 3.8.1.
+They are served by this application so voice recordings can be transcribed
+in the browser without uploading them to a third-party inference service.
