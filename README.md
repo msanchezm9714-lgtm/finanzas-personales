@@ -1,4 +1,4 @@
-# Wallet Cleaner — finanzas personales
+# Walleto — finanzas personales
 
 MVP privado para registrar ingresos, gastos y transferencias. La base de datos es la fuente de verdad y la hoja de cálculo queda como exportación futura.
 

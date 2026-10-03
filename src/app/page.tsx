@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
   return (
     <main className="login-screen">
       <section className="login-card">
-        <div className="login-brand"><span className="brand-mark" aria-hidden="true"/><span>Wallet Cleaner</span></div>
+        <div className="login-brand"><span className="brand-mark" aria-hidden="true"/><span>Walleto</span></div>
         <p className="eyebrow">TU DINERO, MÁS CLARO</p>
         <h1>Tu dinero,<br /><span>en perspectiva.</span></h1>
         <p className="login-copy">Un espacio privado para entender cómo se mueve tu dinero.</p>
@@ -31,7 +31,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
       <aside className="login-art" aria-hidden="true">
         <div className="art-glow" />
         <p className="art-kicker">LLEVA UN ORDEN<br />EN TUS FINANZAS.</p>
-        <Image className="art-portrait" src="/wallet-cleaner-face-reference.png" width={1254} height={1254} alt="" priority />
+        <Image className="art-portrait" src="/walleto-face.png" width={1254} height={1254} alt="" priority />
         <p className="art-caption">Tus decisiones<br />también cuentan.</p>
         <span className="art-index">01 — 03</span>
       </aside>

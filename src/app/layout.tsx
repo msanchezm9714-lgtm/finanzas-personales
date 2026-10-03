@@ -3,7 +3,7 @@ import "./globals.css";
 import "./brand.css";
 
 export const metadata: Metadata = {
-  title: "Wallet Cleaner — Finanzas personales",
+  title: "Walleto — Finanzas personales",
   description: "Un espacio privado para entender cómo se mueve tu dinero.",
 };
 

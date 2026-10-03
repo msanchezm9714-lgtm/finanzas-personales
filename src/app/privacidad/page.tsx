@@ -9,7 +9,7 @@ export default function PrivacyPage() {
   return (
     <main className="legal-page">
       <article className="legal-card">
-        <a className="legal-brand" href="/">Wallet Cleaner</a>
+        <a className="legal-brand" href="/">Walleto</a>
         <p className="eyebrow">INFORMACIÓN SOBRE TUS DATOS</p>
         <h1>Política de privacidad</h1>
         <p className="legal-updated">Actualizada el 2 de octubre de 2026</p>

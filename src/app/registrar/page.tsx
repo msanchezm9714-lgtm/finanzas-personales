@@ -5,9 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
 
 export const metadata: Metadata = {
-  title: "Registrar movimiento — Wallet Cleaner",
+  title: "Registrar movimiento — Walleto",
   description: "Anota gastos e ingresos en una conversación privada.",
-  appleWebApp: { capable: true, title: "Wallet Cleaner", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Walleto", statusBarStyle: "default" },
 };
 
 type RecentMovement = {
@@ -48,7 +48,7 @@ export default async function Registrar({ searchParams }: {
         <header className="chat-header">
           <div className="chat-identity">
             <span className="chat-avatar" aria-hidden="true"/>
-            <div><strong>Wallet Cleaner</strong><small><i /> Tu espacio privado</small></div>
+            <div><strong>Walleto</strong><small><i /> Tu espacio privado</small></div>
           </div>
           <a className="chat-dashboard-link" href="/dashboard" aria-label="Ver panel financiero">Mi panel <span aria-hidden="true">↗</span></a>
         </header>
