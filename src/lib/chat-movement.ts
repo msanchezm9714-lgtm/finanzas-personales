@@ -101,13 +101,13 @@ export function readChatMessage(value: string, current: ChatMovement, today: str
   const normalized = normalize(message);
   const stage = nextStep(current);
   const detectedType = detectType(normalized);
-  const type = detectedType ?? current.type ?? (stage === "type" && /^(gasto|gastos)$/.test(normalized) ? "expense" : /^(ingreso|ingresos)$/.test(normalized) ? "income" : null);
   const possibleAmount = parseAmount(message);
   const isFullMessage = Boolean(detectedType && possibleAmount);
+  const type = (stage === "type" || isFullMessage ? detectedType : null) ?? current.type ?? (stage === "type" && /^(gasto|gastos)$/.test(normalized) ? "expense" : /^(ingreso|ingresos)$/.test(normalized) ? "income" : null);
   const amount = (stage === "amount" || isFullMessage ? possibleAmount : null) ?? current.amount;
   let description = current.description;
-  if (!description && (stage === "description" || isFullMessage)) {
-    const candidate = isFullMessage ? extractDescription(message) : message;
+  if (!description && (stage === "description" || isFullMessage || (stage === "type" && possibleAmount))) {
+    const candidate = isFullMessage || stage === "type" ? extractDescription(message) : message;
     if (candidate && !/^\d+(?:[.,]\d{1,2})?$/.test(candidate)) description = candidate.slice(0, 160);
   }
   const date = current.date || dateFromText(message, today);
