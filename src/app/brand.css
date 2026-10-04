@@ -302,11 +302,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .confetti i:nth-child(4n) { background: #fff; }
 @keyframes confetti-burst { from { opacity: 1; transform: translate(0, 0) rotate(0); } to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(560deg); } }
 @keyframes cross-off { from { text-decoration-color: transparent; } to { text-decoration-color: var(--brand-lime); } }
-.plan-form-card { display: grid; grid-template-columns: .8fr 1.2fr; gap: 26px; align-items: start; }
+.plan-form-card { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 26px; align-items: start; }
+.plan-form-card > * { min-width: 0; }
 .plan-form-card > div > p:last-child { max-width: 230px; color: #a5c5c9; font-size: 13px; line-height: 1.5; }
-.plan-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.plan-field { display: grid; gap: 7px; color: #bfdbdd; font-size: 12px; }
-.plan-field input, .plan-field select, .inline-plan-form input, .pot-adjust-form input, .pot-adjust-form select { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid rgba(36, 199, 214, .35); border-radius: 10px; color: #f4fff7; background: #073b50; color-scheme: dark; font: inherit; font-size: 13px; }
+.plan-form { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.plan-field { min-width: 0; display: grid; gap: 7px; color: #bfdbdd; font-size: 12px; }
+.plan-field input, .plan-field select, .inline-plan-form input, .pot-adjust-form input, .pot-adjust-form select { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid rgba(36, 199, 214, .35); border-radius: 10px; color: #f4fff7; background: #073b50; color-scheme: dark; font: inherit; font-size: 16px; }
 .plan-field input::placeholder, .inline-plan-form input::placeholder, .pot-adjust-form input::placeholder { color: #8aafb4; }
 .plan-form > button { grid-column: 1 / -1; min-height: 45px; justify-content: center; }
 .debt-list { display: grid; gap: 13px; }
@@ -327,7 +328,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .pot-item > strong { display: block; margin: 13px 0 2px; color: var(--brand-lime); font: 400 31px var(--serif); letter-spacing: -.04em; }
 .pot-adjust-form { display: grid; grid-template-columns: 1fr 105px auto; gap: 7px; margin-top: 18px; }
 .plan-wrap .app-footer a { color: var(--brand-lime); }
-@media (max-width: 800px) { .planning-shortcuts { grid-template-columns: repeat(2, 1fr); } .plan-form-card { grid-template-columns: 1fr; } .plan-form-card > div > p:last-child { max-width: none; } }
+@media (max-width: 800px) { .planning-shortcuts { grid-template-columns: repeat(2, 1fr); } .plan-form-card { grid-template-columns: minmax(0, 1fr); } .plan-form-card > div > p:last-child { max-width: none; } }
 @media (max-width: 620px) {
   .topbar .brand { font-size: 21px; }
   .topbar-right .avatar { display: none; }
@@ -348,7 +349,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .payment-row time { grid-column: 1; padding-left: 40px; }
   .payment-amount { grid-column: 2; }
   .payment-actions { grid-column: 1 / -1; justify-content: flex-end; }
-  .plan-form { grid-template-columns: 1fr; }
+  .plan-form { grid-template-columns: minmax(0, 1fr); }
   .pot-grid { grid-template-columns: 1fr; }
   .pot-adjust-form { grid-template-columns: 1fr 99px; }
   .pot-adjust-form button { grid-column: 1 / -1; }
