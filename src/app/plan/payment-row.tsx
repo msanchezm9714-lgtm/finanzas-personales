@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { completePlannedPayment } from "./actions";
 import { formatDate, formatMoney } from "@/lib/money";
 
-type Payment = { id: string; title: string; amount: number; due_date: string; category: string; paid_at: string | null };
+type Payment = { id: string; title: string; amount: number; due_date: string; category: string; paid_at: string | null; debt_id: string | null };
 
-export function PaymentRow({ payment }: { payment: Payment }) {
+export function PaymentRow({ payment, onDebtPage = false }: { payment: Payment; onDebtPage?: boolean }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [celebrating, setCelebrating] = useState(false);
   const [error, setError] = useState("");
   const paid = Boolean(payment.paid_at) || celebrating;
+  const needsDebtLink = payment.category === "Deudas" && !payment.debt_id && !paid;
 
   function complete(alreadyRecorded: boolean) {
     if (isPending || paid) return;
@@ -29,7 +30,7 @@ export function PaymentRow({ payment }: { payment: Payment }) {
     <div className="payment-name"><span className="payment-check" aria-hidden="true">{paid ? "✓" : "○"}</span><span className="payment-title"><strong>{payment.title}</strong><small>{payment.category}</small></span></div>
     <time dateTime={payment.due_date}>{formatDate(payment.due_date)}</time>
     <strong className="payment-amount">{formatMoney(Number(payment.amount))}</strong>
-    <div className="payment-actions">{payment.paid_at ? <span className="paid-badge">Pagado</span> : <>
+    <div className="payment-actions">{payment.paid_at ? <span className="paid-badge">Pagado</span> : needsDebtLink ? onDebtPage ? <span className="payment-link-prompt">Vincúlalo antes de marcarlo</span> : <a className="recorded-button" href="/plan/deudas">Vincular en Tus deudas ↗</a> : <>
       <button className="pay-button" type="button" disabled={isPending || paid} onClick={() => complete(false)}>{celebrating ? "¡Hecho!" : isPending ? "Guardando…" : "Ya pagué ✓"}</button>
       <button className="recorded-button" type="button" disabled={isPending || paid} onClick={() => complete(true)}>Ya lo anoté</button>
     </>}</div>

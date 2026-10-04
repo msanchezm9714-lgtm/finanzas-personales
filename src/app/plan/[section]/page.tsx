@@ -2,17 +2,19 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/app/components/app-header";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatMoney } from "@/lib/money";
-import { adjustMoneyPot, createDebt, createMoneyPot, createPlannedPayment, recordDebtPayment } from "../actions";
+import { adjustMoneyPot, createMoneyPot, createPlannedPayment, linkPlannedPaymentToDebt, scheduleDebtPayment } from "../actions";
+import { DateField } from "../date-field";
+import { DebtCreateDialog } from "../debt-create-dialog";
 import { PaymentRow } from "../payment-row";
 
-type Payment = { id: string; title: string; amount: number; due_date: string; category: string; paid_at: string | null };
-type Debt = { id: string; title: string; original_amount: number; remaining_amount: number; due_date: string | null };
+type Payment = { id: string; title: string; amount: number; due_date: string; category: string; paid_at: string | null; debt_id: string | null };
+type Debt = { id: string; title: string; category: string; original_amount: number; remaining_amount: number; due_date: string | null };
 type Pot = { id: string; title: string; kind: "envelope" | "goal"; allocated: number; target_amount: number | null };
 type Section = "pagos" | "deudas" | "apartados" | "metas";
 
 const sectionCopy: Record<Section, { eyebrow: string; title: string; intro: string }> = {
   pagos: { eyebrow: "TU CALENDARIO", title: "Próximos pagos", intro: "Anota lo que debes pagar, mira cuándo vence y márcalo cuando esté listo." },
-  deudas: { eyebrow: "PASO A PASO", title: "Tus deudas", intro: "Ten claro lo que falta y registra cada abono sin perder el hilo." },
+  deudas: { eyebrow: "PASO A PASO", title: "Tus deudas", intro: "Planea tus pagos, confirma cada abono y ve cómo baja el saldo de cada deuda." },
   apartados: { eyebrow: "DINERO CON DESTINO", title: "Apartados", intro: "Separa mentalmente dinero para renta, servicios, transporte o lo que viene." },
   metas: { eyebrow: "LO QUE VIENE", title: "Metas de ahorro", intro: "Dale nombre a lo que quieres lograr y mira cómo avanzas." },
 };
@@ -40,7 +42,7 @@ function PaymentSection({ items, debts, today }: { items: Payment[]; debts: Debt
     <section className="plan-card plan-form-card"><div><p className="eyebrow">EN UN MOMENTO</p><h2>Añadir un pago</h2><p>Solo necesitas concepto, monto y fecha. Puedes añadir más después.</p></div><form action={createPlannedPayment} className="plan-form">
       <FormField label="¿Qué vas a pagar?"><input name="title" placeholder="Ej. Internet, renta o luz" maxLength={100} required /></FormField>
       <FormField label="¿Cuánto?"><input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></FormField>
-      <FormField label="¿Cuándo vence?"><input name="due_date" type="date" defaultValue={today} required /></FormField>
+      <DateField label="¿Cuándo vence?" today={today} />
       <FormField label="Categoría"><select name="category" defaultValue="Servicios"><option>Servicios</option><option>Vivienda</option><option>Transporte</option><option>Salud</option><option>Educación</option><option>Alimentación</option><option>Deudas</option><option>Otros</option></select></FormField>
       {debts.some((debt) => Number(debt.remaining_amount) > 0) && <FormField label="¿Es un abono a una deuda?"><select name="debt_id" defaultValue=""><option value="">No, es otro pago</option>{debts.filter((debt) => Number(debt.remaining_amount) > 0).map((debt) => <option value={debt.id} key={debt.id}>{debt.title} · {formatMoney(Number(debt.remaining_amount))} restantes</option>)}</select></FormField>}
       <button className="button button-primary" type="submit">Guardar pago ↗</button>
@@ -49,14 +51,32 @@ function PaymentSection({ items, debts, today }: { items: Payment[]; debts: Debt
   </>;
 }
 
-function DebtSection({ items }: { items: Debt[] }) {
+function DebtSection({ items, payments, today }: { items: Debt[]; payments: Payment[]; today: string }) {
   const remaining = items.reduce((sum, item) => sum + Number(item.remaining_amount), 0);
+  const upcoming = payments.filter((item) => !item.paid_at);
+  const completed = payments.filter((item) => item.paid_at);
+  const activeDebts = items.filter((item) => Number(item.remaining_amount) > 0);
   return <>
-    <div className="plan-stat-row"><div className="plan-stat featured"><span>Saldo pendiente de tus deudas</span><strong>{formatMoney(remaining)}</strong><small>Esta cifra no se descuenta completa del disponible para usar.</small></div><div className="plan-stat"><span>Deudas activas</span><strong>{items.filter((item) => Number(item.remaining_amount) > 0).length}</strong><small>Un abono reduce tu saldo registrado.</small></div></div>
-    <section className="plan-card"><div className="plan-card-head"><div><p className="eyebrow">TU AVANCE</p><h2>Deudas anotadas</h2></div><span className="count-pill">{items.length}</span></div>
-      {items.length ? <div className="debt-list">{items.map((item) => { const original = Number(item.original_amount); const left = Number(item.remaining_amount); const progress = Math.max(0, Math.min(100, (original - left) / original * 100)); return <article className="debt-item" key={item.id}><div className="debt-top"><div><h3>{item.title}</h3><small>{item.due_date ? `Fecha objetivo: ${formatDate(item.due_date)}` : "Sin fecha límite"}</small></div><strong>{left === 0 ? "Liquidada ✓" : `${formatMoney(left)} pendientes`}</strong></div><div className="plan-progress"><span style={{ width: `${progress}%` }} /></div><p>{formatMoney(original - left)} abonados de {formatMoney(original)}</p>{left > 0 && <form action={recordDebtPayment} className="inline-plan-form"><input type="hidden" name="id" value={item.id} /><label>Registrar abono<input name="amount" type="number" min="0.01" max={left} step="0.01" placeholder="Monto" required /></label><label className="already-recorded"><input type="checkbox" name="already_recorded" />Ya lo anoté como gasto</label><button className="plan-small-button" type="submit">Abonar ↗</button></form>}</article>; })}</div> : <Empty title="Empieza con una deuda">Anota el monto que queda por pagar. Puedes indicar si un abono ya está registrado como gasto.</Empty>}
+    <section className="plan-card"><div className="plan-card-head"><div><p className="eyebrow">A LA VISTA</p><h2>Futuros pagos</h2></div><span className="count-pill">{upcoming.length}</span></div>
+      {upcoming.length ? <div className="payment-table"><div className="payment-table-head"><span>Concepto</span><span>Fecha</span><span>Monto</span><span>Estado</span></div>{upcoming.map((payment) => <div className="debt-future-item" key={payment.id}><PaymentRow payment={payment} onDebtPage />{payment.category === "Deudas" && !payment.debt_id && (activeDebts.length > 0 ? <form action={linkPlannedPaymentToDebt} className="debt-link-form"><input type="hidden" name="payment_id" value={payment.id} /><label htmlFor={`debt-link-${payment.id}`}>Vincular a deuda</label><select id={`debt-link-${payment.id}`} name="debt_id" defaultValue="" required><option value="" disabled>Selecciona una deuda</option>{activeDebts.map((debt) => <option key={debt.id} value={debt.id}>{debt.title}</option>)}</select><button type="submit">Vincular</button></form> : <p className="debt-link-hint">Toca + para agregar la deuda y vincular este pago.</p>)}</div>)}</div> : <Empty title="Sin pagos próximos">Programa un abono desde una deuda o añade un pago en Próximos pagos.</Empty>}
     </section>
-    <section className="plan-card plan-form-card"><div><p className="eyebrow">TODO CLARO</p><h2>Añadir una deuda</h2><p>Anota cuánto falta por pagar hoy. La fecha es opcional.</p></div><form action={createDebt} className="plan-form"><FormField label="Nombre"><input name="title" placeholder="Ej. Tarjeta o préstamo" maxLength={100} required /></FormField><FormField label="Monto pendiente"><input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></FormField><FormField label="Fecha objetivo (opcional)"><input name="due_date" type="date" /></FormField><button className="button button-primary" type="submit">Guardar deuda ↗</button></form></section>
+    <div className="plan-stat-row"><div className="plan-stat featured"><span>Saldo pendiente de tus deudas</span><strong>{formatMoney(remaining)}</strong><small>Esta cifra no se descuenta completa del disponible para usar.</small></div><div className="plan-stat"><span>Deudas activas</span><strong>{activeDebts.length}</strong><small>Confirma un abono arriba para reducir el saldo.</small></div></div>
+    <section className="plan-card"><div className="plan-card-head"><div><p className="eyebrow">TU AVANCE</p><h2>Todas tus deudas</h2></div><span className="count-pill">{items.length}</span></div>
+      {items.length ? <div className="debt-list">{items.map((item) => {
+        const original = Number(item.original_amount);
+        const left = Number(item.remaining_amount);
+        const progress = Math.max(0, Math.min(100, (original - left) / original * 100));
+        const reserved = upcoming.filter((payment) => payment.debt_id === item.id).reduce((sum, payment) => sum + Number(payment.amount), 0);
+        const available = Math.max(0, left - reserved);
+        return <article className="debt-item" key={item.id}>
+          <div className="debt-top"><div><h3>{item.title}</h3><small>{item.category} · {item.due_date ? `Objetivo: ${formatDate(item.due_date)}` : "Sin fecha objetivo"}</small></div><strong>{left === 0 ? "Liquidada ✓" : `${formatMoney(left)} pendientes`}</strong></div>
+          <div className="plan-progress"><span style={{ width: `${progress}%` }} /></div>
+          <p>{formatMoney(original - left)} pagados de {formatMoney(original)}{reserved > 0 ? ` · ${formatMoney(reserved)} programados` : ""}</p>
+          {left > 0 && (available > 0 ? <details className="debt-schedule"><summary>Programar pago parcial <span aria-hidden="true">＋</span></summary><form action={scheduleDebtPayment} className="plan-form debt-schedule-form"><input type="hidden" name="debt_id" value={item.id} /><FormField label="¿Cuánto quieres abonar?"><input name="amount" type="number" inputMode="decimal" min="0.01" max={available} step="0.01" placeholder="0.00" required /></FormField><DateField label="¿Cuándo planeas pagarlo?" today={today} /><button className="button button-primary" type="submit">Añadir a futuros pagos ↗</button></form></details> : <p className="debt-all-planned">Todo el saldo pendiente ya tiene pagos programados.</p>)}
+        </article>;
+      })}</div> : <Empty title="Empieza con una deuda">Toca el botón + para registrar el saldo completo y luego programa tus abonos.</Empty>}
+    </section>
+    {completed.length > 0 && <details className="plan-card debt-completed"><summary>Pagos ya realizados ({completed.length})</summary><div className="payment-table">{completed.map((payment) => <PaymentRow key={payment.id} payment={payment} />)}</div></details>}
   </>;
 }
 
@@ -87,27 +107,24 @@ export default async function PlanningPage({ params, searchParams }: { params: P
   let debts: Debt[] = [];
   let pots: Pot[] = [];
   let dataError = false;
-  if (selected === "pagos") {
+  if (selected === "pagos" || selected === "deudas") {
     const [{ data, error }, { data: debtData, error: debtError }] = await Promise.all([
-      supabase.from("planned_payments").select("id,title,amount,due_date,category,paid_at").eq("user_id", user.id).order("due_date", { ascending: true }),
-      supabase.from("debts").select("id,title,original_amount,remaining_amount,due_date").eq("user_id", user.id),
+      supabase.from("planned_payments").select("id,title,amount,due_date,category,paid_at,debt_id").eq("user_id", user.id).order("due_date", { ascending: true }),
+      supabase.from("debts").select("id,title,category,original_amount,remaining_amount,due_date").eq("user_id", user.id).order("created_at", { ascending: false }),
     ]);
     payments = (data ?? []) as Payment[];
     debts = (debtData ?? []) as Debt[];
     dataError = Boolean(error || debtError);
-  } else if (selected === "deudas") {
-    const { data, error } = await supabase.from("debts").select("id,title,original_amount,remaining_amount,due_date").eq("user_id", user.id).order("created_at", { ascending: false });
-    debts = (data ?? []) as Debt[];
-    dataError = Boolean(error);
   } else {
     const { data, error } = await supabase.from("money_pots").select("id,title,kind,allocated,target_amount").eq("user_id", user.id).eq("kind", selected === "metas" ? "goal" : "envelope").order("created_at", { ascending: false });
     pots = (data ?? []) as Pot[];
     dataError = Boolean(error);
   }
   const copy = sectionCopy[selected];
-  return <main className="app-shell"><AppHeader email={user.email} /><div className="dashboard-wrap plan-wrap"><div className="plan-hero"><a href="/dashboard" className="plan-back">← Mi panel</a><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p>{copy.intro}</p></div>
+  return <main className="app-shell"><AppHeader email={user.email} /><div className={`dashboard-wrap plan-wrap ${selected === "deudas" ? "has-debt-fab" : ""}`}><div className="plan-hero"><a href="/dashboard" className="plan-back">← Mi panel</a><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p>{copy.intro}</p></div>
     {query.error && <div className="notice error-notice" role="alert">{query.error}</div>}{query.saved && <div className="notice success-notice">{query.saved === "abono" ? "Abono registrado. Tu panel ya refleja el movimiento." : "Listo, los cambios quedaron guardados."}</div>}{dataError && <div className="notice error-notice" role="alert">No pudimos cargar esta sección. Falta aplicar la migración de planificación en Supabase.</div>}
-    {!dataError && (selected === "pagos" ? <PaymentSection items={payments} debts={debts} today={today} /> : selected === "deudas" ? <DebtSection items={debts} /> : <PotSection items={pots} kind={selected === "metas" ? "goal" : "envelope"} />)}
+    {!dataError && (selected === "pagos" ? <PaymentSection items={payments} debts={debts} today={today} /> : selected === "deudas" ? <DebtSection items={debts} payments={payments} today={today} /> : <PotSection items={pots} kind={selected === "metas" ? "goal" : "envelope"} />)}
+    {selected === "deudas" && !dataError && <DebtCreateDialog today={today} />}
     <footer className="app-footer"><span>Walleto <i>·</i> claridad financiera, a tu ritmo.</span><a href="/dashboard">Volver a mi panel ↗</a></footer>
   </div></main>;
 }

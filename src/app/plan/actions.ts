@@ -7,6 +7,14 @@ import { createClient } from "@/lib/supabase/server";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const paymentCategories = ["Vivienda", "Servicios", "Transporte", "Salud", "Educación", "Alimentación", "Deudas", "Otros"];
 
+function formDate(formData: FormData) {
+  const day = String(formData.get("due_day") ?? "");
+  const month = String(formData.get("due_month") ?? "");
+  const year = String(formData.get("due_year") ?? "");
+  if (day || month || year) return `${year}-${month}-${day}`;
+  return String(formData.get("due_date") ?? "");
+}
+
 function money(value: FormDataEntryValue | null, allowZero = false) {
   const text = String(value ?? "").trim();
   const amount = Number(text);
@@ -41,18 +49,16 @@ export async function createPlannedPayment(formData: FormData) {
   if (!user) redirect("/");
   const name = title(formData.get("title"));
   const amount = money(formData.get("amount"));
-  const dueDate = String(formData.get("due_date") ?? "");
+  const dueDate = formDate(formData);
   const category = String(formData.get("category") ?? "Servicios");
   const debtId = String(formData.get("debt_id") ?? "");
   if (!name || amount === null || !validDate(dueDate) || !paymentCategories.includes(category)) {
     goError("/plan/pagos", "Revisa el concepto, monto y fecha del pago.");
   }
   if (debtId && !uuidPattern.test(debtId)) goError("/plan/pagos", "Deuda vinculada inválida.");
-  if (debtId) {
-    const { data: debt, error: debtError } = await supabase.from("debts").select("remaining_amount").eq("id", debtId).eq("user_id", user.id).maybeSingle();
-    if (debtError || !debt || amount > Number(debt.remaining_amount)) goError("/plan/pagos", "El pago supera el saldo de la deuda vinculada.");
-  }
-  const { error } = await supabase.from("planned_payments").insert({ user_id: user.id, title: name, amount, due_date: dueDate, category: debtId ? "Deudas" : category, debt_id: debtId || null });
+  const { error } = debtId
+    ? await supabase.rpc("schedule_debt_payment", { p_debt_id: debtId, p_amount: amount, p_due_date: dueDate, p_title: name })
+    : await supabase.from("planned_payments").insert({ user_id: user.id, title: name, amount, due_date: dueDate, category });
   if (error) goError("/plan/pagos", "No se pudo guardar el pago. Revisa la configuración de la base de datos.");
   refreshPlanning();
   redirect("/plan/pagos?saved=1");
@@ -75,12 +81,40 @@ export async function createDebt(formData: FormData) {
   if (!user) redirect("/");
   const name = title(formData.get("title"));
   const amount = money(formData.get("amount"));
-  const date = String(formData.get("due_date") ?? "");
-  if (!name || amount === null || (date && !validDate(date))) goError("/plan/deudas", "Revisa el nombre, monto y fecha de la deuda.");
-  const { error } = await supabase.from("debts").insert({ user_id: user.id, title: name, original_amount: amount, remaining_amount: amount, due_date: date || null });
+  const date = formDate(formData);
+  const category = String(formData.get("category") ?? "").trim();
+  if (!name || amount === null || (date && !validDate(date)) || category.length < 2 || category.length > 40) goError("/plan/deudas", "Revisa el nombre, valor, fecha y etiqueta de la deuda.");
+  const { error } = await supabase.from("debts").insert({ user_id: user.id, title: name, original_amount: amount, remaining_amount: amount, due_date: date || null, category });
   if (error) goError("/plan/deudas", "No se pudo guardar la deuda. Revisa la configuración de la base de datos.");
   refreshPlanning();
   redirect("/plan/deudas?saved=1");
+}
+
+export async function scheduleDebtPayment(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/");
+  const debtId = String(formData.get("debt_id") ?? "");
+  const amount = money(formData.get("amount"));
+  const dueDate = formDate(formData);
+  if (!uuidPattern.test(debtId) || amount === null || !validDate(dueDate)) goError("/plan/deudas", "Revisa el monto y la fecha del futuro abono.");
+  const { error } = await supabase.rpc("schedule_debt_payment", { p_debt_id: debtId, p_amount: amount, p_due_date: dueDate });
+  if (error) goError("/plan/deudas", "No se pudo programar el abono. Comprueba que no supere el saldo disponible de la deuda.");
+  refreshPlanning();
+  redirect("/plan/deudas?saved=programado");
+}
+
+export async function linkPlannedPaymentToDebt(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/");
+  const paymentId = String(formData.get("payment_id") ?? "");
+  const debtId = String(formData.get("debt_id") ?? "");
+  if (!uuidPattern.test(paymentId) || !uuidPattern.test(debtId)) goError("/plan/deudas", "Selecciona una deuda válida.");
+  const { error } = await supabase.rpc("link_planned_payment_to_debt", { p_payment_id: paymentId, p_debt_id: debtId });
+  if (error) goError("/plan/deudas", "No se pudo vincular el pago. Comprueba el saldo de la deuda.");
+  refreshPlanning();
+  redirect("/plan/deudas?saved=vinculado");
 }
 
 export async function recordDebtPayment(formData: FormData) {
