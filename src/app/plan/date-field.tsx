@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { Icon } from "@/app/components/icons";
 
 const weekdays = ["L", "M", "X", "J", "V", "S", "D"];
 const displayDate = new Intl.DateTimeFormat("es", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -56,13 +57,13 @@ export function DateField({ label, today, optional = false }: { label: string; t
       onClick={toggleCalendar}
     >
       <span id={`${id}-value`}>{selected ? displayDate.format(new Date(`${selected}T12:00:00Z`)) : "Seleccionar fecha"}</span>
-      <span aria-hidden="true" className="plan-date-icon">▦</span>
+      <span aria-hidden="true" className="plan-date-icon"><Icon name="calendar" size={19} /></span>
     </button>
     {open && <div className="plan-calendar" id={`${id}-calendar`} role="group" aria-label={`Calendario para ${label.toLowerCase()}`}>
       <div className="plan-calendar-head">
-        <button type="button" aria-label="Mes anterior" onClick={() => moveMonth(-1)}>‹</button>
+        <button type="button" aria-label="Mes anterior" onClick={() => moveMonth(-1)}><Icon name="back" size={16} /></button>
         <strong>{displayMonth.format(utcDate(year, month, 1))}</strong>
-        <button type="button" aria-label="Mes siguiente" onClick={() => moveMonth(1)}>›</button>
+        <button type="button" aria-label="Mes siguiente" onClick={() => moveMonth(1)}><Icon name="next" size={16} /></button>
       </div>
       <div className="plan-calendar-grid plan-calendar-weekdays">
         {weekdays.map((day, index) => <span key={index} aria-hidden="true">{day}</span>)}

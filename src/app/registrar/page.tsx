@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { aiEnabled } from "@/lib/walleto-ai";
 import { GuidedChat } from "./guided-chat";
 
 export const metadata: Metadata = {
@@ -18,10 +19,7 @@ type RecentMovement = {
   created_at: string;
 };
 
-export default async function Registrar({ searchParams }: {
-  searchParams: Promise<{ error?: string; guardado?: string }>;
-}) {
-  const { error, guardado } = await searchParams;
+export default async function Registrar() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/?next=registrar");
@@ -35,5 +33,5 @@ export default async function Registrar({ searchParams }: {
   const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Cancun", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
   const dateValues = Object.fromEntries(dateParts.map(({ type, value }) => [type, value]));
   const today = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
-  return <GuidedChat movements={movements} historyError={Boolean(historyError)} saved={Boolean(guardado)} error={error} today={today} />;
+  return <GuidedChat movements={movements} historyError={Boolean(historyError)} today={today} aiOn={aiEnabled()} />;
 }

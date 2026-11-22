@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition, type CSSProperties } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { completePlannedPayment } from "./actions";
 import { formatDate, formatMoney } from "@/lib/money";
+import { Icon, categoryIcon } from "@/app/components/icons";
 
 type Payment = { id: string; title: string; amount: number; due_date: string; category: string; paid_at: string | null; debt_id: string | null };
 
@@ -27,11 +29,11 @@ export function PaymentRow({ payment, onDebtPage = false }: { payment: Payment; 
   }
 
   return <div className={`payment-row ${paid ? "is-paid" : ""} ${celebrating ? "is-celebrating" : ""}`}>
-    <div className="payment-name"><span className="payment-check" aria-hidden="true">{paid ? "✓" : "○"}</span><span className="payment-title"><strong>{payment.title}</strong><small>{payment.category}</small></span></div>
+    <div className="payment-name"><span className="payment-check" aria-hidden="true"><Icon name={paid ? "check" : categoryIcon(payment.category)} size={16} /></span><span className="payment-title"><strong>{payment.title}</strong><small>{payment.category}</small></span></div>
     <time dateTime={payment.due_date}>{formatDate(payment.due_date)}</time>
     <strong className="payment-amount">{formatMoney(Number(payment.amount))}</strong>
-    <div className="payment-actions">{payment.paid_at ? <span className="paid-badge">Pagado</span> : needsDebtLink ? onDebtPage ? <span className="payment-link-prompt">Vincúlalo antes de marcarlo</span> : <a className="recorded-button" href="/plan/deudas">Vincular en Tus deudas ↗</a> : <>
-      <button className="pay-button" type="button" disabled={isPending || paid} onClick={() => complete(false)}>{celebrating ? "¡Hecho!" : isPending ? "Guardando…" : "Ya pagué ✓"}</button>
+    <div className="payment-actions">{payment.paid_at ? <span className="paid-badge">Pagado</span> : needsDebtLink ? onDebtPage ? <span className="payment-link-prompt">Vincúlalo antes de marcarlo</span> : <Link className="recorded-button" href="/plan/deudas">Vincular en Tus deudas</Link> : <>
+      <button className="pay-button" type="button" disabled={isPending || paid} onClick={() => complete(false)}>{celebrating ? "¡Hecho!" : isPending ? "Guardando…" : "Ya pagué"}</button>
       <button className="recorded-button" type="button" disabled={isPending || paid} onClick={() => complete(true)}>Ya lo anoté</button>
     </>}</div>
     {celebrating && <div className="confetti" aria-hidden="true">{Array.from({ length: 16 }, (_, index) => {

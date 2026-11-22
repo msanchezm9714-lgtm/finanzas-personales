@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import { signIn } from "@/app/actions";
+import { Icon } from "@/app/components/icons";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
@@ -13,9 +14,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
 
   return (
     <main className="login-screen">
-      <section className="login-card">
-        <div className="login-brand"><span className="brand-mark" aria-hidden="true"/><span>Walleto</span></div>
-        <p className="eyebrow">TU DINERO, MÁS CLARO</p>
+      <section className="login-card" data-reveal="left">
+        <div className="login-brand"><span className="brand-mark" aria-hidden="true"/><span className="glitch" data-text="WALLETO">WALLETO</span></div>
+        <p className="eyebrow">Sistema financiero personal</p>
         <h1>Tu dinero,<br /><span>en perspectiva.</span></h1>
         <p className="login-copy">Un espacio privado para entender cómo se mueve tu dinero.</p>
         <form action={signIn} className="login-form">
@@ -23,17 +24,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
           <label>Correo electrónico<input name="email" type="email" autoComplete="email" placeholder="tu@correo.com" required /></label>
           <label>Contraseña<input name="password" type="password" autoComplete="current-password" placeholder="Tu contraseña" required /></label>
           {error && <p className="form-error">{error}</p>}
-          <button className="button button-primary" type="submit">Entrar a mi espacio <span>↗</span></button>
+          <button className="button button-primary" type="submit">Entrar a mi espacio <Icon name="arrow" size={16} /></button>
         </form>
-        <p className="login-note">Acceso privado · Solo tú puedes ver tus movimientos</p>
+        <p className="login-note"><Icon name="shield" size={12} /> Acceso privado · Solo tú puedes ver tus movimientos</p>
         <nav className="login-legal-links" aria-label="Información legal"><a href="/privacidad">Privacidad</a><a href="/condiciones">Condiciones</a><a href="/eliminar-datos">Eliminar datos</a></nav>
       </section>
-      <aside className="login-art" aria-hidden="true">
+      <aside className="login-art" aria-hidden="true" data-reveal="zoom">
         <div className="art-glow" />
         <p className="art-kicker">LLEVA UN ORDEN<br />EN TUS FINANZAS.</p>
         <Image className="art-portrait" src="/walleto-face.png" width={1254} height={1254} alt="" priority />
         <p className="art-caption">Tus decisiones<br />también cuentan.</p>
-        <span className="art-index">01 — 03</span>
+        <span className="art-index">SYS//01 — ONLINE</span>
       </aside>
     </main>
   );
