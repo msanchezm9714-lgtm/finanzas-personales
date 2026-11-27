@@ -83,8 +83,13 @@ export async function createDebt(formData: FormData) {
   const amount = money(formData.get("amount"));
   const date = formDate(formData);
   const category = String(formData.get("category") ?? "").trim();
-  if (!name || amount === null || (date && !validDate(date)) || category.length < 2 || category.length > 40) goError("/plan/deudas", "Revisa el nombre, valor, fecha y etiqueta de la deuda.");
-  const { error } = await supabase.from("debts").insert({ user_id: user.id, title: name, original_amount: amount, remaining_amount: amount, due_date: date || null, category });
+  const annualRate = rate(formData.get("annual_rate"));
+  const minText = String(formData.get("min_payment") ?? "").trim();
+  const minPayment = minText ? money(minText) : undefined;
+  if (!name || amount === null || (date && !validDate(date)) || category.length < 2 || category.length > 40 || annualRate === null || minPayment === null) goError("/plan/deudas", "Revisa el nombre, valor, fecha, etiqueta, tasa y pago mínimo de la deuda.");
+  // Las columnas de tasa y mínimo solo se envían si el usuario las llenó (así funciona aunque falte la migración).
+  const terms = { ...(annualRate !== undefined && { annual_rate: annualRate }), ...(minPayment !== undefined && { min_payment: minPayment }) };
+  const { error } = await supabase.from("debts").insert({ user_id: user.id, title: name, original_amount: amount, remaining_amount: amount, due_date: date || null, category, ...terms });
   if (error) goError("/plan/deudas", "No se pudo guardar la deuda. Revisa la configuración de la base de datos.");
   refreshPlanning();
   redirect("/plan/deudas?saved=1");
@@ -102,6 +107,49 @@ export async function scheduleDebtPayment(formData: FormData) {
   if (error) goError("/plan/deudas", "No se pudo programar el abono. Comprueba que no supere el saldo disponible de la deuda.");
   refreshPlanning();
   redirect("/plan/deudas?saved=programado");
+}
+
+function rate(value: FormDataEntryValue | null) {
+  const text = String(value ?? "").trim().replace(",", ".");
+  if (!text) return undefined;
+  const amount = Number(text);
+  return /^\d+(?:\.\d{1,2})?$/.test(text) && amount >= 0 && amount <= 500 ? amount : null;
+}
+
+export async function updateDebtTerms(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/");
+  const id = String(formData.get("id") ?? "");
+  const annualRate = rate(formData.get("annual_rate"));
+  const minText = String(formData.get("min_payment") ?? "").trim();
+  const minPayment = minText ? money(minText) : undefined;
+  if (!uuidPattern.test(id) || annualRate === null || minPayment === null) goError("/plan/deudas", "Revisa la tasa (0 a 500 %) y el pago mínimo.");
+  const { error } = await supabase.from("debts").update({ annual_rate: annualRate ?? null, min_payment: minPayment ?? null }).eq("id", id).eq("user_id", user.id);
+  if (error) goError("/plan/deudas", "No se pudo guardar la tasa. Aplica la migración del plan para salir de deudas en Supabase.");
+  refreshPlanning();
+  redirect("/plan/deudas?saved=condiciones#plan-deudas");
+}
+
+export async function scheduleDebtPlan(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/");
+  const dueDate = formDate(formData);
+  let items: { debt_id: string; amount: number }[] = [];
+  try {
+    const parsed: unknown = JSON.parse(String(formData.get("plan") ?? "[]"));
+    if (Array.isArray(parsed)) {
+      items = parsed.map((entry) => ({ debt_id: String(entry?.debt_id ?? ""), amount: money(String(entry?.amount ?? "")) ?? 0 }));
+    }
+  } catch { items = []; }
+  if (!validDate(dueDate) || !items.length || items.length > 50 || items.some((entry) => !uuidPattern.test(entry.debt_id) || entry.amount <= 0)) {
+    goError("/plan/deudas", "Revisa la fecha y los montos del plan.");
+  }
+  const { error } = await supabase.rpc("schedule_debt_plan", { p_items: items, p_due_date: dueDate });
+  if (error) goError("/plan/deudas", "No se pudo programar el plan. Puede que algún abono supere el saldo libre de la deuda o falte aplicar la migración.");
+  refreshPlanning();
+  redirect("/plan/deudas?saved=plan");
 }
 
 export async function linkPlannedPaymentToDebt(formData: FormData) {

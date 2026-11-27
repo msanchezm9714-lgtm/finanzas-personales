@@ -19,6 +19,8 @@ export function DebtCreateDialog({ today }: { today: string }) {
       <form action={createDebt} className="plan-form debt-create-form">
         <label className="plan-field"><span>Nombre</span><input name="title" placeholder="Ej. Préstamo de Manuel" maxLength={100} required /></label>
         <label className="plan-field"><span>Valor pendiente</span><input name="amount" type="number" inputMode="decimal" min="0.01" step="0.01" placeholder="0.00" required /></label>
+        <label className="plan-field"><span>Tasa anual % (opcional)</span><input name="annual_rate" type="number" inputMode="decimal" min="0" max="500" step="0.01" placeholder="Ej. 54.9" /></label>
+        <label className="plan-field"><span>Pago mínimo mensual (opcional)</span><input name="min_payment" type="number" inputMode="decimal" min="0.01" step="0.01" placeholder="0.00" /></label>
         <DateField label="Fecha objetivo (opcional)" today={today} optional />
         <label className="plan-field"><span>Etiqueta</span><input name="category" list="debt-labels" placeholder="Ej. Personal o tarjeta" maxLength={40} required /><datalist id="debt-labels"><option value="Personal" /><option value="Tarjeta" /><option value="Préstamo" /><option value="Servicios" /><option value="Otros" /></datalist></label>
         <button className="button button-primary" type="submit">Guardar deuda <Icon name="check" size={16} /></button>

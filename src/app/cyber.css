@@ -546,3 +546,64 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .motion-ready [data-reveal] { opacity: 1; translate: none; scale: none; filter: none; }
   .cyber-aurora, .cyber-noise { animation: none; }
 }
+
+/* ---------- Plan para salir de deudas (bola de nieve / avalancha) ---------- */
+.strategy-card { scroll-margin-top: 90px; border-color: var(--line-strong); background: radial-gradient(ellipse at 100% 0%, rgba(60, 242, 255, .08), transparent 45%), rgba(12, 16, 31, .74); }
+.strategy-intro { max-width: 640px; margin: 4px 0 22px; color: var(--dim); font-size: 14px; line-height: 1.6; }
+.strategy-budget { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: end; margin-bottom: 20px; }
+.strategy-budget input { font: 600 22px var(--display) !important; font-variant-numeric: tabular-nums; }
+.strategy-budget-meta { display: grid; gap: 6px; padding-bottom: 6px; color: var(--dim); font: 400 12px var(--mono); }
+.strategy-budget-meta strong { color: var(--text); font-weight: 500; }
+.strategy-budget-meta .is-extra strong { color: var(--lime); }
+.strategy-budget-meta .is-short strong { color: var(--danger); }
+.strategy-warning { margin: 0 0 12px; }
+.strategy-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.strategy-method { display: grid; gap: 6px; padding: 18px 20px; border: 1px solid var(--line); clip-path: var(--chamfer); color: var(--text); background: rgba(5, 6, 13, .55); font: inherit; text-align: left; cursor: pointer; transition: border-color .25s, background .25s, box-shadow .25s; }
+.strategy-method:hover { border-color: rgba(60, 242, 255, .4); }
+.strategy-method.is-selected { border-color: var(--lime); background: radial-gradient(ellipse at 100% 0%, rgba(196, 243, 108, .16), transparent 55%), rgba(5, 6, 13, .7); box-shadow: inset 0 0 0 1px rgba(196, 243, 108, .35); }
+.strategy-method-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--cyan); font: 600 15px var(--display); }
+.strategy-method.is-selected .strategy-method-head { color: var(--lime); }
+.strategy-method-head em, .strategy-route-when em, .strategy-month-list em { padding: 3px 7px; clip-path: var(--chamfer-sm); color: var(--void); background: var(--lime); font: 600 9.5px var(--mono); font-style: normal; letter-spacing: .1em; text-transform: uppercase; }
+.strategy-method > small { color: var(--faint); font: 400 11px/1.5 var(--mono); }
+.strategy-method > strong { margin-top: 6px; font: 600 clamp(22px, 3vw, 30px)/1.05 var(--display); letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.strategy-method-meta { color: var(--dim); font: 400 11.5px var(--mono); }
+.strategy-stats { margin-bottom: 14px; }
+.strategy-stats .plan-stat { min-height: 0; }
+.strategy-chart { margin: 0 0 22px; padding: 16px 16px 10px; border: 1px solid var(--line); clip-path: var(--chamfer); background: rgba(5, 6, 13, .5); }
+.strategy-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.strategy-grid { stroke: rgba(129, 146, 255, .14); stroke-width: 1; }
+.strategy-axis { fill: var(--faint); font: 400 10px var(--mono); }
+.strategy-line { filter: drop-shadow(0 0 5px currentColor); }
+.strategy-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; color: var(--dim); font: 400 11px var(--mono); }
+.strategy-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.strategy-legend i { width: 16px; height: 3px; box-shadow: 0 0 8px currentColor; }
+.strategy-route { margin-bottom: 22px; }
+.strategy-route ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.strategy-route li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); clip-path: var(--chamfer-sm); background: rgba(5, 6, 13, .45); }
+.strategy-route li.is-target { border-color: var(--line-strong); background: rgba(196, 243, 108, .06); }
+.strategy-step { color: var(--cyan); font: 500 13px var(--mono); }
+.strategy-route li.is-target .strategy-step { color: var(--lime); text-shadow: 0 0 10px rgba(196, 243, 108, .5); }
+.strategy-route-name { display: grid; gap: 3px; min-width: 0; }
+.strategy-route-name strong { overflow: hidden; color: var(--text); font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.strategy-route-name small { color: var(--faint); font: 400 11px var(--mono); }
+.strategy-route-when { display: flex; align-items: center; gap: 8px; color: var(--dim); font: 400 11.5px var(--mono); text-align: right; white-space: nowrap; }
+.strategy-month { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.strategy-month h3 { margin: 0; color: var(--text); font: 600 20px var(--display); letter-spacing: -.03em; }
+.strategy-month > div > p:last-child { margin: 8px 0 0; color: var(--dim); font-size: 13px; line-height: 1.55; }
+.strategy-month-list { display: grid; gap: 8px; }
+.strategy-month-list > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 14px; border-left: 2px solid var(--line); background: rgba(5, 6, 13, .4); }
+.strategy-month-list > div.is-target { border-left-color: var(--lime); }
+.strategy-month-list > div > span { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--text); font-size: 13.5px; }
+.strategy-month-list > div > strong { color: var(--lime); font: 500 14px var(--mono); font-variant-numeric: tabular-nums; }
+.strategy-month-list > div > small { grid-column: 1 / -1; color: var(--faint); font: 400 10.5px var(--mono); }
+.strategy-schedule-form { grid-template-columns: minmax(0, 1fr); margin-top: 6px; }
+.strategy-note, .strategy-disclaimer { margin: 18px 0 0; color: var(--dim); font: 400 11.5px/1.6 var(--mono); }
+.strategy-note { display: flex; gap: 8px; align-items: flex-start; color: var(--cyan); }
+.strategy-disclaimer { margin-top: 10px; color: var(--faint); }
+.debt-terms-value { margin-left: auto; padding-right: 10px; color: var(--faint); font: 400 11px var(--mono); }
+@media (max-width: 800px) { .strategy-month { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 620px) {
+  .strategy-budget, .strategy-methods { grid-template-columns: minmax(0, 1fr); }
+  .strategy-route li { grid-template-columns: auto minmax(0, 1fr); }
+  .strategy-route-when { grid-column: 2; justify-content: flex-start; text-align: left; }
+}
